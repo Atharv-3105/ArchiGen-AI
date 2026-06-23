@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { validateAndParseDiagram, type DiagramPayload } from '../lib/schema';
+import { useAuth } from '@clerk/clerk-react';
 
 
 type StreamStatus = 'idle' | 'streaming' | 'complete' | 'error';
@@ -13,6 +14,9 @@ interface StreamState {
 }
 
 export function useArchitectureStream() {
+
+    //Define the token function
+    const { getToken } = useAuth();
     const [state, setState ] = useState<StreamState>({
         status: 'idle',
         currentNode: null,
@@ -33,6 +37,12 @@ export function useArchitectureStream() {
         }));
 
         try {
+            
+            //Fetch the JWT token from Clerk
+            const token = await getToken();
+            if(!token){
+                throw new Error("Authentication Required.Please sign in.");
+            }
 
             //Route to /refine if we have an existing diagram
             const url = existingDiagram ? 'http://localhost:8000/refine' : 'http://localhost:8000/generate';
@@ -47,7 +57,7 @@ export function useArchitectureStream() {
             //get the Response from the backend
             const response = await fetch(url, {
                 method: "POST",
-                headers: {"Content-Type": 'application/json'},
+                headers: {"Content-Type": 'application/json', "Authorization" : `Bearer ${token}`},
                 body,
             });
 
@@ -143,7 +153,7 @@ export function useArchitectureStream() {
                 error: err instanceof Error ? err.message : 'An unknown network error occured',
             }));
         }
-    }, []);
+    }, [getToken]);
 
     return { ...state, startGeneration };
 }

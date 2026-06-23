@@ -4,8 +4,64 @@ import { ExcalidrawCanvas } from './components/ExcalidrawCanvas';
 import { ProgressIndicator } from './components/ProgressIndicator';
 import { useArchitectureStream } from './hooks/useArchitectureStream';
 import { Wand2, Loader2, Sparkles } from 'lucide-react';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 
+
+
+
+//Function which checks for SignedIn our SignedOut user
 function App() {
+  return (
+    <div className="h-screen w-screen flex flex-col bg-background">
+      {/* Header with Auth Buttons */}
+      <header className="h-14 border-b border-border flex items-center justify-between px-6 flex-shrink-0">
+        <h1 className="text-x1 font-bold text-white flex items-center gap-2">
+          <Wand2 className="w-5 h-5 text-primary" />
+            ArchiGen AI
+        </h1>
+        <nav className="flex items-center gap-4">
+          <SignedOut>
+            <SignInButton mode = "modal">
+              <button className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2 px-4 rounded-md transition-colors">
+                Sign In
+              </button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton afterSignOutUrl='/' />
+          </SignedIn>
+        </nav>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-hidden">
+        <SignedIn>
+           <AppContent />
+        </SignedIn>
+        <SignedOut>
+          <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-gradient-to-b from-background to-surface">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+              <Wand2 className="w-10 h-10 text-primary" />
+            </div>
+            <h2 className="text-4xl font-bold text-white mb-4">AgenticAI Architecture Diagrams</h2>
+            <p className="text-zinc-400 mb-8 max-w-lg text-lg">
+              Describe your software system in plain English.Our multi-agent AI system will generate a beautiful, structured Excalidraw diagram in seconds.
+            </p>
+            <SignInButton mode = "modal">
+              <button className="bg-primary hover:bg-primary-hover text-white font-semibold py-3 px-8 rounded-lg transition-colors text-lg shadow-lg shadow-primary/20">
+                Get Started for Free
+              </button>
+            </SignInButton>
+            <p className="text-zinc-500 text-sm mt-6">5 free diagrams per day.</p>
+          </div>
+        </SignedOut>
+      </main>
+    </div>
+  );
+}
+
+//The main app logic, which will only render if SignedIn
+function AppContent() {
   const streamState = useArchitectureStream();
   const [userInput, setUserInput] = useState('');
   
