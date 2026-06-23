@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { validateAndParseDiagram, type DiagramPayload } from '../lib/schema';
+import { useAuth } from '@clerk/clerk-react';
 
 
 type StreamStatus = 'idle' | 'streaming' | 'complete' | 'error';
@@ -13,6 +14,9 @@ interface StreamState {
 }
 
 export function useArchitectureStream() {
+
+    //Define the token function
+    const { getToken } = useAuth();
     const [state, setState ] = useState<StreamState>({
         status: 'idle',
         currentNode: null,
@@ -21,27 +25,45 @@ export function useArchitectureStream() {
         error: null,
     });
 
-    const startGeneration = useCallback(async (userInput: string) => {
-        //Reset the state for a new Generation
-        setState({
+    const startGeneration = useCallback(async (userInput: string, existingDiagram?: DiagramPayload) => {
+        //Reset the state for a new Generation/Refinement
+        setState(prev => ({
+            ...prev,
             status: 'streaming',
             currentNode: null,
             completedNodes: [],
-            diagram: null,
             error: null,
-        });
+            diagram: existingDiagram || null,
+        }));
 
         try {
             
-            console.log("Starting Generation Request...")
+            //Fetch the JWT token from Clerk
+            const token = await getToken();
+            if(!token){
+                throw new Error("Authentication Required.Please sign in.");
+            }
+
+            //Route to /refine if we have an existing diagram
+            const url = existingDiagram ? 'http://localhost:8000/refine' : 'http://localhost:8000/generate';
+            const body = existingDiagram ? 
+                         JSON.stringify({diagram_payload: existingDiagram, edit_instruction: userInput})
+                        :JSON.stringify({ user_input: userInput });
+
+            
+            console.log(`Starting ${existingDiagram ? 'Refinement' : 'Generation'} Request...`);
+            console.log('Sending payload to', url, body);
+
             //get the Response from the backend
-            const response = await fetch("http://localhost:8000/generate", {
+            const response = await fetch(url, {
                 method: "POST",
-                headers: {"Content-Type": 'application/json'},
-                body: JSON.stringify({user_input: userInput}),
+                headers: {"Content-Type": 'application/json', "Authorization" : `Bearer ${token}`},
+                body,
             });
 
             if(!response.ok) {
+                const errorBody = await response.text();
+                console.error('Backend Error body:', errorBody);
                 throw new Error(`Backend returned HTTP ${response.status}`);
             }
 
@@ -131,7 +153,7 @@ export function useArchitectureStream() {
                 error: err instanceof Error ? err.message : 'An unknown network error occured',
             }));
         }
-    }, []);
+    }, [getToken]);
 
     return { ...state, startGeneration };
 }
