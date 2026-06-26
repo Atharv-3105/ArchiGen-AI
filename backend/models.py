@@ -140,8 +140,13 @@ class ArrowElement(ExcalidrawElement):
     roundness:      Dict[str, int] = {"type": 2}
     lastCommittedPoint:  Optional[Any] = None
     
+class Annotation(BaseModel):
+    target_node: str = Field(..., description="The ID of the node this note points to")
+    note_text: str = Field(..., description = "The short 1-sentence architectural note")
+    
 class ExcalidrawPayload(BaseModel):
     elements:   List[Union[RectangleElement, TextElement,ArrowElement]]
     appState:   Dict[str, Any] = {"viewBackgroundColor": "#09090b", "theme":"dark"}
+    adr_markdown: Optional[str] = Field(None, description = "The generated Architectural Decision Record")
 
     
