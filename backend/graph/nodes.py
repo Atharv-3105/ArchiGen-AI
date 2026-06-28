@@ -8,8 +8,9 @@ from agents.validator import validate_diagram
 from agents.repair import repair_graph
 from agents.refinement import refine_graph
 from agents.annotation import generate_annotations
+from agents.export import generate_mermaid
 
-from models import ExcalidrawPayload
+from models import ExcalidrawPayload, ComponentGraph
 
 logger = logging.getLogger(__name__)
 
@@ -138,3 +139,22 @@ def annotation_node(state: ArchitectureState) -> dict:
     return {
         "excalidraw_payload": updated_payload.model_dump()
     }
+    
+    
+def export_node(state: ArchitectureState) -> dict:
+    """ 
+        Node 9: Generates export formats(Mermaid)
+    """
+    
+    logger.info("-----Entering Export Node-----")
+    
+    graph = ComponentGraph.model_validate(state["component_graph"])
+    payload = ExcalidrawPayload.model_validate(state["excalidraw_payload"])
+    
+    #Generate Mermaid Code
+    mermaid = generate_mermaid(graph)
+    payload.mermaid_code = mermaid
+    
+    return {"excalidraw_payload": payload.model_dump()}
+
+    

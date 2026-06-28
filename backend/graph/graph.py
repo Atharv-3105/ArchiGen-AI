@@ -5,7 +5,7 @@ from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 
 from graph.state import ArchitectureState
 from graph.nodes import (parser_node, clarification_node, architecture_node, layout_node, 
-                         style_node, validator_node, repair_node, refinement_node, annotation_node)
+                         style_node, validator_node, repair_node, refinement_node, annotation_node, export_node)
 from models import ParsedIntent, ComponentGraph, PositionedGraph, ExcalidrawPayload
 
 # Define serializer with custom types allowlisted for security and warning suppression
@@ -74,6 +74,7 @@ workflow.add_node("style", style_node)
 workflow.add_node("validator", validator_node)
 workflow.add_node("repair", repair_node)
 workflow.add_node("annotation", annotation_node)
+workflow.add_node("export", export_node)
 
 #3. Define Edges
 workflow.add_conditional_edges(
@@ -102,6 +103,8 @@ workflow.add_edge("refinement","layout")
 workflow.add_edge("architecture", "layout")
 workflow.add_edge("layout", "style")
 workflow.add_edge("style", "annotation")
+workflow.add_edge("annotation", "export")
+workflow.add_edge("export", "validator")
 workflow.add_edge("annotation", "validator")
 
 # Conditional Routing After Validator
