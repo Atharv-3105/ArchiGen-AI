@@ -7,7 +7,9 @@ from agents.style import apply_styles
 from agents.validator import validate_diagram
 from agents.repair import repair_graph
 from agents.refinement import refine_graph
+from agents.annotation import generate_annotations
 
+from models import ExcalidrawPayload
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +69,16 @@ def validator_node(state: ArchitectureState) -> dict:
         Node 6: Checks for Structural Errors.
     """
     logger.info("-------Entering Validator Node-------")
-    errors = validate_diagram(state["excalidraw_payload"])
+    
+    #The LangGraph State stores the payload as a Dict. Convert it back to Pydantic Model for Validation Agent
+    payload_dict = state['excalidraw_payload']
+
+    if isinstance(payload_dict, dict):
+        payload = ExcalidrawPayload.model_validate(payload_dict)
+    else:
+        payload = payload_dict
+        
+    errors = validate_diagram(payload)
     return {
         "validation_errors": errors
     }
@@ -109,4 +120,21 @@ def refinement_node(state: ArchitectureState) -> dict:
     return {
         "component_graph": refined_graph,
         "refinement_instruction": None
+    }
+    
+def annotation_node(state: ArchitectureState) -> dict:
+    """ 
+        Node: Generates sticky note callouts and the ADR markdown
+    """
+    
+    logger.info("------Entering Annotation Node-------")
+    
+    from models import PositionedGraph, ExcalidrawPayload
+    graph = PositionedGraph.model_validate(state["positioned_graph"])
+    payload = ExcalidrawPayload.model_validate(state["excalidraw_payload"])
+    
+    updated_payload = generate_annotations(graph, payload)
+    
+    return {
+        "excalidraw_payload": updated_payload.model_dump()
     }
