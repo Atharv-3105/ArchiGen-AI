@@ -6,6 +6,7 @@ import { useArchitectureStream } from './hooks/useArchitectureStream';
 import { Wand2, Loader2, Sparkles, FileText, X} from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import ReactMarkdown from 'react-markdown';
+import { ExportMenu } from './components/ExportMenu';
 
 
 
@@ -177,6 +178,11 @@ function AppContent() {
       }
       rightPanel={
         <div className="h-full w-full bg-background relative">
+          {diagram && (
+            <div className="absolute top-4 right-4 z-10">
+               <ExportMenu diagram={diagram} />
+            </div>
+          )}
           <ExcalidrawCanvas diagram={diagram} />
         </div>
       }

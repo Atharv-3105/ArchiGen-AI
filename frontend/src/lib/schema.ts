@@ -87,6 +87,7 @@ export const DiagramPayloadSchema = z.object({
   elements: z.array(ExcalidrawElementSchema),
   appState: AppStateSchema,
   adr_markdown: z.string().optional(), 
+  mermaid_code: z.string().optional(),
 });
 
 // Export inferred TypeScript types for use in our components
