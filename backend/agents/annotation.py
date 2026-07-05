@@ -4,7 +4,7 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from models import PositionedGraph, ExcalidrawPayload, AnnotationOutput, RectangleElement, TextElement, ArrowElement
 import json
-# from utils.text_wrap import wrap_text
+from utils.text_wrap import wrap_text
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +109,13 @@ def generate_annotations(graph: PositionedGraph, current_payload: ExcalidrawPayl
             text_id = f"text-{note_id}"
             arrow_id = f"arrow-{note_id}"
             
+            #Wrap the note-text string with explicit newlines so it doesn't overflow
+            wrapped_note_text = wrap_text(note_text, max_chars_per_line = 22)
+            
+            #Calculate dynamic height based on line-counts, so that the sticky-notes box expand easily
+            line_count = len(wrapped_note_text.split("\n"))
+            note_height = max(60, (line_count * 18) + 20)
+            
             #Sticky Note Rectangle 
             new_elements.append(RectangleElement(
                 id = note_id, x = note_x, y = note_y, width = note_width, height = note_height,
@@ -120,9 +127,9 @@ def generate_annotations(graph: PositionedGraph, current_payload: ExcalidrawPayl
             
             #Text Inside Sticky Node
             new_elements.append(TextElement(
-                id = text_id, x = note_x + 10, y = note_y + 15, width = note_width - 20, height = 30,
-                text = note.note_text, originalText = note.note_text, containerId = note_id,
-                strokeColor = "#713f12", fontSize = 12,
+                id = text_id, x = note_x + 10, y = note_y + 15, width = note_width - 20, height = note_height - 24,
+                text = wrapped_note_text, originalText = wrapped_note_text, containerId = note_id,
+                strokeColor = "#713f12", fontSize = 12,textAlign="center", verticalAlign="middle",
                 seed = random.randint(100000000, 999999999), versionNonce=random.randint(100000000, 999999999)
             ))
             
