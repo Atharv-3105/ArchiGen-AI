@@ -79,23 +79,28 @@ def apply_styles(graph: PositionedGraph) -> ExcalidrawPayload:
             logger.warning(f"Edge references missing node: {edge.source} -> {edge.target}")
             continue
         
-        #Calculate centers
-        source_cx = source_node.x + (NODE_WIDTH / 2)
-        source_cy = source_node.y + (NODE_HEIGHT / 2)
-        target_cx = target_node.x + (NODE_WIDTH / 2)
-        target_cy = target_node.y + (NODE_HEIGHT / 2)
+        #Calculate borders docking points instead of center points
+        arrow_start_x = source_node.x + NODE_WIDTH
+        arrow_start_y = source_node.y + (NODE_HEIGHT / 2)
         
+        arrow_end_x = target_node.x
+        arrow_end_y = target_node.y + (NODE_HEIGHT / 2)
+        
+        #Excalidraw arrow widths and heights must be positive
+        width = abs(arrow_end_x - arrow_start_x)
+        height = abs(arrow_end_y - arrow_start_y)
+    
         #Arrow starts at the right edge of the source, ends at the left edge of the target
         arrow_id = f"arrow-{edge.source}-{edge.target}"
         arrow = ArrowElement(
             id = arrow_id,
-            x = source_cx,
-            y = source_cy,
-            width = target_cx - source_cx,
-            height = target_cy - source_cy,
+            x = arrow_start_x,
+            y = arrow_start_y,
+            width = width,
+            height = height,
             strokeColor = "#52525b",
             backgroundColor = "transparent",
-            points = [[0,0], [target_cx - source_cx, target_cy - source_cy]],
+            points = [[0,0], [arrow_end_x - arrow_start_x, arrow_end_y - arrow_start_y]],
             startBinding = {"elementId": f"rect-{edge.source}", "focus": 0, "gap": 1},
             endBinding = {"elementId": f"rect-{edge.target}", "focus":0, "gap": 1},
             seed = generate_unique_id(),
