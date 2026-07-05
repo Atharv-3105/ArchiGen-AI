@@ -3,12 +3,13 @@ import random
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from models import PositionedGraph, ExcalidrawPayload, AnnotationOutput, RectangleElement, TextElement, ArrowElement
-
+import json
+# from utils.text_wrap import wrap_text
 
 logger = logging.getLogger(__name__)
 
 llm = ChatGroq(
-    model = "llama-3.3-70b-versatile",
+    model = "openai/gpt-oss-120b",
     temperature = 0.3,
     max_tokens = 2048
 )
@@ -16,19 +17,27 @@ llm = ChatGroq(
 SYSTEM_PROMPT = """ 
 You are an expert software architect reviewing a system design.
 Given a positioned componenet graph, your task is to:
-1. Identify 2 to 3 key architectural highlights, bottlenecks, or important decision. For each, provide the exact 'id' of the target node and a concise 1-sentence note.
-2. Write a comprehensive Architecture Decision Record(ADR) in Markdown format. Include sections for: Context, Decision, Consequnces, and Alternatives Considered.
+1. Identify 2 to 3 key architectural highlights, bottlenecks, or important decisions. 
+2. For each note, you MUST use the EXACT 'id' string provided in the nodes list below. Do NOT invent new IDs or abbreviate them.
+3. Write a comprehensive Architecture Decision Record (ADR) in Markdown format.
+
+CRITICAL RULE: ONLY return the exact string ID (e.g., 'nodejs-api-gateway'). NEVER return X/Y coordinates (like 100.0 or 434.46) as IDs.
 
 Output ONLY valid JSON matching the provided schema.
 """
 PROMPT_TEMPLATE = """ 
-POSITIONED GRAPH (JSON):
-{graph_json}
+Please analyze the architecture and provide your notes and ADR: {logical_graph_json}
 """
 
 def generate_annotations(graph: PositionedGraph, current_payload: ExcalidrawPayload) -> ExcalidrawPayload:
     
     logger.info("Starting Annotation Agent....")
+    
+    #Generate logical graph for the LLM, hiding the X/Y co-ordinates preventing hallucinations
+    logical_graph = {
+        "nodes":[{"id":n.id, "name": n.name, "type":n.type, "layer":n.layer} for n in graph.nodes],
+        "edges":[{"source": e.source, "target": e.target, "label": e.label} for e in graph.edges]
+    }
     
     prompt = ChatPromptTemplate.from_messages([
         ("system", SYSTEM_PROMPT),
@@ -39,14 +48,17 @@ def generate_annotations(graph: PositionedGraph, current_payload: ExcalidrawPayl
     
     try:
         
-        result = chain.invoke({"graph_json": graph.model_dump_json()})
+        result = chain.invoke({"logical_graph_json":json.dumps(logical_graph, indent = 2)})
         logger.info(f"Annotation Agent Generated {len(result.annotations)} notes and an ADR.")
         
         #------Deterministic Mapping: Convert Annotations to Excalidraw Elements----
         new_elements = list(current_payload.elements) 
         node_map = {n.id : n for n in graph.nodes}
         
-        for note in result.annotations:
+        #Track occupied positions to prevent overlap of generated sticky notes
+        occupied_positions = {}
+        
+        for idx, note in enumerate(result.annotations):
             
             #Convert the 'note' to dict for safely_accessing the fields 
             note_dict = note.model_dump() if hasattr(note, 'model_dump') else dict(note)
@@ -54,6 +66,10 @@ def generate_annotations(graph: PositionedGraph, current_payload: ExcalidrawPayl
             #THE LLM can response using multiple field_names for target_note_id so check for it
             target_id = note_dict.get('target_node_id') or note_dict.get('node_id') or note_dict.get('target_id') or note_dict.get('target_node')
             note_text = note_dict.get('note_text') or note_dict.get('text') or note_dict.get('note')
+            
+            #Type-check if the LLM hallucinated a float
+            if not isinstance(target_id, str):
+                logger.warning(f"LLM hallucinated a non-string ID: {target_id} (type: {type(target_id)})")
             
             if not target_id or not note_text:
                 logger.warning(f"Skipping annotation due to missing fields: {note_dict}")
@@ -64,14 +80,32 @@ def generate_annotations(graph: PositionedGraph, current_payload: ExcalidrawPayl
                 logger.warning(f"Annotation target '{target_id}' not found in graph.")
                 continue
             
-            
             #Position sticky note above the target node
             note_x = target_node.x
-            note_y = target_node.y - 120
+            base_note_y = target_node.y - 120
             note_width = 160
             note_height = 60
+            vertical_spacing = 80
             
-            note_id = f"note-{target_id}"
+            #Check if current x-position is already occupied
+            if note_x not in occupied_positions:
+                occupied_positions[note_x] = []
+                
+            note_y = base_note_y
+            #Find a y-position that doesn't overlap with existing notes at x-posi
+            collision_detected = True
+            while collision_detected:
+                collision_detected = False
+                for occupied_y in occupied_positions[note_x]:
+                    if abs(note_y - occupied_y) < (note_height + 20):
+                        note_y = occupied_y - (note_height + vertical_spacing)
+                        collision_detected = True
+                        break
+                    
+            occupied_positions[note_x].append(note_y)
+            
+            
+            note_id = f"note-{target_id}-{idx}"
             text_id = f"text-{note_id}"
             arrow_id = f"arrow-{note_id}"
             
