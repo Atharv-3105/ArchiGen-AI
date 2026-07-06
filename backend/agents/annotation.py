@@ -9,7 +9,7 @@ from utils.text_wrap import wrap_text
 logger = logging.getLogger(__name__)
 
 llm = ChatGroq(
-    model = "openai/gpt-oss-120b",
+    model = "llama-3.3-70b-versatile",
     temperature = 0.3,
     max_tokens = 2048
 )

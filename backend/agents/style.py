@@ -58,7 +58,7 @@ def apply_styles(graph: PositionedGraph) -> ExcalidrawPayload:
             y = node.y + (NODE_HEIGHT / 2) - 10,
             width = NODE_WIDTH - 20,
             height = 20,
-            stokeColor = colors["text"],
+            strokeColor = colors["text"],
             backgroundColor = "transparent",
             text = node.name,
             originalText = node.name,

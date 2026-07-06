@@ -13,7 +13,7 @@ const STEPS = [
         id: 'parser', label: 'Parsing Intent'
     },
     {
-        id: 'architecutre', label: 'Designing Architecture'
+        id: 'architecture', label: 'Designing Architecture'
     },
     {
         id: 'layout', label: 'Calculating Layout'
