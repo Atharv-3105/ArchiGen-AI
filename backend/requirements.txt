@@ -9,3 +9,4 @@ pydot
 python-jose[cryptography]
 httpx
 aiosqlite
+pyjwt

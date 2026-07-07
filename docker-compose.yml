@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: archigen_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount the local code to container for faster reloading
+      - ./backend:/app
+      # Prevent local Windows venv & python cache from overwriting container libraries
+      - /app/venv
+      - /app/__pycache__
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: archigen_frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      # Mount the local code to container for fast reloading
+      - ./frontend:/app
+      # Prevent local empty node_modules from overwriting container's installed modules
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
