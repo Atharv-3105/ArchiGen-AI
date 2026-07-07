@@ -10,7 +10,6 @@ interface ExportMenuProps {
 export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
 
     const [isOpen, setIsOpen] = useState(false);
-    const [isExporting, setIsExporting] = useState(false);
 
     const downloadFile = (content: string | Blob, filename: string, mimetype: string) => {
         const blob = content instanceof Blob ? content: new Blob([content], {type: mimetype});
@@ -27,8 +26,6 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
     };
 
     const handleExport = async (format: string) => {
-
-        setIsExporting(true);
         try {
             switch (format) {
                 case 'json':
@@ -68,7 +65,6 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
             console.error("Export failed: ", error);
             alert("Failed to export diagram. Check console for details.");
         } finally {
-            setIsExporting(false);
             setIsOpen(false);
         }
     };
