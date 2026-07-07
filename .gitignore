@@ -4,4 +4,3 @@ docs
 venv
 .vscode
 backend/archigen.db
-backend/archigen.db
