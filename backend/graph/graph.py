@@ -5,7 +5,7 @@ from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 
 from graph.state import ArchitectureState
 from graph.nodes import (parser_node, clarification_node, architecture_node, layout_node, 
-                         style_node, validator_node, repair_node, refinement_node, annotation_node)
+                         style_node, validator_node, repair_node, refinement_node, annotation_node, export_node)
 from models import ParsedIntent, ComponentGraph, PositionedGraph, ExcalidrawPayload
 
 # Define serializer with custom types allowlisted for security and warning suppression
@@ -48,7 +48,7 @@ def route_after_validator(state: ArchitectureState):
     """
     
     errors = state.get("validation_errors", [])
-    attempts = state.get("repair_attempts", [])
+    attempts = state.get("repair_attempts", 0)
     
     if errors and attempts < 3:
         logger.info(f"Routing to Repair Node. Errors: {errors}")
@@ -58,8 +58,8 @@ def route_after_validator(state: ArchitectureState):
         logger.error("Max repair attempts reached. Failing Pipeline")
         return "end"
     
-    logger.info("Validation passed. Routing to END")
-    return "end"
+    logger.info("Validation passed. Routing to Annotation Node")
+    return "annotation"
 
 #1. Initialize the StateGraph 
 workflow = StateGraph(ArchitectureState)
@@ -74,6 +74,7 @@ workflow.add_node("style", style_node)
 workflow.add_node("validator", validator_node)
 workflow.add_node("repair", repair_node)
 workflow.add_node("annotation", annotation_node)
+workflow.add_node("export", export_node)
 
 #3. Define Edges
 workflow.add_conditional_edges(
@@ -96,25 +97,27 @@ workflow.add_conditional_edges(
 
 # Linear Flow (Clarification-> Architecture -> Layout -> Style -> Validator)
 workflow.add_edge("clarification", "architecture")
-
-workflow.add_edge("refinement","layout") 
-
 workflow.add_edge("architecture", "layout")
+workflow.add_edge("refinement","layout") 
 workflow.add_edge("layout", "style")
-workflow.add_edge("style", "annotation")
-workflow.add_edge("annotation", "validator")
+
+#Validate the CORE diagram before we add sticky notes
+workflow.add_edge("style", "validator")
 
 # Conditional Routing After Validator
 workflow.add_conditional_edges(
     "validator",route_after_validator,
     {
         "repair": "repair", 
+        "annotation": "annotation",
         "end": END
     }
 )
 
 # Repair loops back to layout
 workflow.add_edge("repair", "layout")
+workflow.add_edge("annotation", "export")
+workflow.add_edge("export", END)
 
 # 4. Compile the Graph 
 # Add memory saver checkpoint so that get_state() can recognize the last_checkpoint

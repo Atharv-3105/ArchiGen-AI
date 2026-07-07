@@ -152,5 +152,5 @@ class ExcalidrawPayload(BaseModel):
     elements:   List[Union[RectangleElement, TextElement,ArrowElement]]
     appState:   Dict[str, Any] = {"viewBackgroundColor": "#09090b", "theme":"dark"}
     adr_markdown: Optional[str] = Field(None, description = "The generated Architectural Decision Record")
-
+    mermaid_code: Optional[str] = Field(None, description = "Mermaid.js syntax representation")
     

@@ -86,7 +86,8 @@ const AppStateSchema = z.object({
 export const DiagramPayloadSchema = z.object({
   elements: z.array(ExcalidrawElementSchema),
   appState: AppStateSchema,
-  adr_markdown: z.string().optional(), 
+  adr_markdown: z.string().nullish(), //I use nullish to allow null and undefined both types
+  mermaid_code: z.string().nullish(),
 });
 
 // Export inferred TypeScript types for use in our components
@@ -105,9 +106,11 @@ export function validateAndParseDiagram(payload: unknown): DiagramPayload {
     return DiagramPayloadSchema.parse(payload);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('❌ Diagram validation failed:', error.errors);
-      const formattedErrors = error.errors
-        .map(e => `${e.path.join('.')}: ${e.message}`)
+      console.error('❌ Diagram validation failed:', error.issues);
+
+      const issues = (error as any).issues || (error as any).errors || [];
+      const formattedErrors = issues
+        .map((e:any) => `${e.path?.join('.') || 'unknown'}: ${e.message}`)
         .join(', ');
       throw new Error(`Invalid diagram payload: ${formattedErrors}`);
     }
