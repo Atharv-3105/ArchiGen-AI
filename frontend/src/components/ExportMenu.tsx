@@ -14,7 +14,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
     const downloadFile = (content: string | Blob, filename: string, mimetype: string) => {
         const blob = content instanceof Blob ? content: new Blob([content], {type: mimetype});
         
-        //Create a in-browser memory download engine with anchor tag
+        //Create an in-browser memory download engine with anchor tag
         const url  = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -73,41 +73,58 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
     return (
         <div className="relative">
             <button 
-                    onClick = {() => setIsOpen(!isOpen)}
-                    className="flex items-center gap-2 bg-surface hover:bg-zinc-800 border border-border text-zinc-300 text-sm font-medium py-2 px-3 rounded-md transition-colors"
+                onClick = {() => setIsOpen(!isOpen)}
+                className="flex items-center gap-2 bg-surface/80 hover:bg-zinc-900 border border-border/80 text-zinc-300 text-sm font-medium py-2.5 px-4 rounded-lg transition-all active:scale-95 glass-panel"
             >
                 <Download className = "w-4 h-4" />
                 Export 
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-surface border border-border rounded-lg shadow-xl z-50 overflow-hidden">
-                    <div className="p-2 border-b border-border flex justify-between items-center">
-                        <span className="text-xs font-semibold text-zinc-400 uppercase">Download As</span>
-                        <button className="text-zinc-500 hover:text-white" onClick={() => setIsOpen(false)}>
-                            <X className = "w-3 h-3" />
+                <div className="absolute right-0 mt-2.5 w-52 bg-surface/90 border border-border/80 rounded-xl shadow-2xl z-50 overflow-hidden glass-panel origin-top-right transition-all duration-200">
+                    <div className="px-4 py-3 border-b border-border/50 flex justify-between items-center bg-white/[0.01]">
+                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Download As</span>
+                        <button className="text-zinc-500 hover:text-zinc-300 transition-colors" onClick={() => setIsOpen(false)}>
+                            <X className = "w-3.5 h-3.5" />
                         </button>
                     </div>
 
-                    <div className="p-1">
-                        <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors" onClick={() => handleExport('png')}>
-                            <Image className="w-4 h-4 text-blue-400" /> PNG Image
+                    <div className="p-1.5 space-y-0.5">
+                        <button 
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/[0.03] rounded-lg transition-colors group" 
+                            onClick={() => handleExport('png')}
+                        >
+                            <Image className="w-4 h-4 text-blue-400 group-hover:scale-105 transition-transform" /> PNG Image
                         </button>
 
-                        <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors" onClick = {() => handleExport('svg')}>
-                            <Code className="w-4 h-4 text-pink-400" /> SVG Vector 
+                        <button 
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/[0.03] rounded-lg transition-colors group" 
+                            onClick = {() => handleExport('svg')}
+                        >
+                            <Code className="w-4 h-4 text-pink-400 group-hover:scale-105 transition-transform" /> SVG Vector 
                         </button>
 
-                        <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors" onClick = {() => handleExport('json')}>
-                            <FileCode className="w-4 h-4 text-green-400" /> Excalidraw(.JSON) 
+                        <button 
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/[0.03] rounded-lg transition-colors group" 
+                            onClick = {() => handleExport('json')}
+                        >
+                            <FileCode className="w-4 h-4 text-accent-emerald group-hover:scale-105 transition-transform" /> Excalidraw (.JSON) 
                         </button>
 
-                        <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors" onClick = {() => handleExport('mermaid')}>
-                            <Code className="w-4 h-4 text-purple-400" /> Mermaid 
+                        <div className="h-[1px] bg-border/50 my-1 mx-2" />
+
+                        <button 
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/[0.03] rounded-lg transition-colors group" 
+                            onClick = {() => handleExport('mermaid')}
+                        >
+                            <Code className="w-4 h-4 text-purple-400 group-hover:scale-105 transition-transform" /> Mermaid Code
                         </button>
 
-                        <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors" onClick = {() => handleExport('markdown')}>
-                            <FileText className="w-4 h-4 text-yellow-400" /> Markdown 
+                        <button 
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/[0.03] rounded-lg transition-colors group" 
+                            onClick = {() => handleExport('markdown')}
+                        >
+                            <FileText className="w-4 h-4 text-yellow-500 group-hover:scale-105 transition-transform" /> Markdown ADR
                         </button>
                     </div>
                 </div>
