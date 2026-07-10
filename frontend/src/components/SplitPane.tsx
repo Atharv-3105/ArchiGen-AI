@@ -44,10 +44,14 @@ export const SplitPane: React.FC<SplitPaneProps> = ({leftPanel, rightPanel}) => 
             </div>
 
             <div
-                className="w-1 bg-border hover:bg-primary cursor-col-resize transition-colors flex-shrink-0 z-10"
+                className="w-1 bg-border hover:bg-primary/50 cursor-col-resize transition-colors flex-shrink-0 z-10 relative group"
                 onMouseDown={startResizing}
                 title="Drag to resize"
-            />
+            >
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4.5 h-10 rounded-md bg-zinc-800 border border-border/80 flex flex-col gap-0.5 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-lg">
+                    <div className="w-[1.5px] h-3.5 bg-zinc-500 rounded-full" />
+                </div>
+            </div>
 
             <div 
                 className= "h-full bg-background flex-1 overflow-hidden relative"

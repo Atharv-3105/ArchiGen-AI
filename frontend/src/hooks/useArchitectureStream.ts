@@ -155,5 +155,15 @@ export function useArchitectureStream() {
         }
     }, [getToken]);
 
-    return { ...state, startGeneration };
+    const resetStream = useCallback(() => {
+        setState({
+            status: 'idle',
+            currentNode: null,
+            completedNodes: [],
+            diagram: null,
+            error: null,
+        });
+    }, []);
+
+    return { ...state, startGeneration, resetStream };
 }

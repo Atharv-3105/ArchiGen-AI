@@ -68,14 +68,14 @@ export const ExcalidrawCanvas: React.FC<ExcalidrawCanvasProps> = ({ diagram }) =
     return (
       <div className="h-full w-full flex items-center justify-center bg-background text-zinc-500">
         <div className="text-center p-8">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-surface border border-border flex items-center justify-center">
-            <svg className="w-10 h-10 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-11V5zM4 13a1 1 0 011-1h6a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-surface/50 border border-border/80 flex items-center justify-center glass-panel shadow-lg shadow-black/10">
+            <svg className="w-8 h-8 text-primary/60 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
             </svg>
           </div>
-          <p className="text-lg font-medium text-zinc-300">Diagram Canvas</p>
-          <p className="text-sm mt-2 max-w-xs mx-auto">
-            Your Excalidraw canvas will render here once the Agent Pipeline generates the layout.
+          <p className="text-lg font-bold text-zinc-300">Diagram Canvas</p>
+          <p className="text-sm mt-2 max-w-xs mx-auto text-zinc-500 leading-relaxed">
+            Your interactive Excalidraw canvas will render here once the AI Agent pipeline generates the layout.
           </p>
         </div>
       </div>
