@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y graphviz graphviz-dev && rm -rf /var/li
 WORKDIR /app 
 
 #Get the dependencies 
-COPY requirements.txt . 
+COPY backend/requirements.txt . 
 RUN pip install --no-cache-dir -r requirements.txt 
 
 #COPY the rest of the code
