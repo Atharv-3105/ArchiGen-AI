@@ -6,7 +6,8 @@ langgraph
 pydantic
 networkx
 pydot
-python-jose[cryptography]
+pyjwt
 httpx
 aiosqlite
 python-dotenv
+jwt
