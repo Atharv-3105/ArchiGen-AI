@@ -11,7 +11,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt 
 
 #COPY the rest of the code
-COPY . .   
+COPY backend/ .   
 
 #Expose the Port and Run APP 
 EXPOSE 8000
