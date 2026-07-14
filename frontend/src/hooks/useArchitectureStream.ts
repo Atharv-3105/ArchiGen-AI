@@ -45,7 +45,8 @@ export function useArchitectureStream() {
             }
 
             //Route to /refine if we have an existing diagram
-            const url = existingDiagram ? 'http://localhost:8000/refine' : 'http://localhost:8000/generate';
+            const backendURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
+            const url = existingDiagram ? `${backendURL}/refine` : `${backendURL}/generate`;
             const body = existingDiagram ? 
                          JSON.stringify({diagram_payload: existingDiagram, edit_instruction: userInput})
                         :JSON.stringify({ user_input: userInput });
