@@ -1,12 +1,12 @@
-pydantic
-python_dotenv
+fastapi
 uvicorn
+langchain
 langchain-groq
-langchain-community
+langgraph
+pydantic
 networkx
-graphviz
 pydot
 python-jose[cryptography]
 httpx
 aiosqlite
-pyjwt
+python-dotenv
