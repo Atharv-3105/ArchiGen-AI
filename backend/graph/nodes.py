@@ -32,7 +32,7 @@ def clarification_node(state: ArchitectureState) -> dict:
         Node 2: Handle Ambiguities.
     """
     logger.info("------Entering Clarification Node-------")
-    logger.warning(f"Ambiguities Detected: {state["ambiguities"]}. Pass for now")
+    logger.warning(f"Ambiguities Detected: {state['ambiguities']}. Pass for now")
     
     
 def architecture_node(state: ArchitectureState) -> dict:
