@@ -10,4 +10,3 @@ pyjwt
 httpx
 aiosqlite
 python-dotenv
-jwt
