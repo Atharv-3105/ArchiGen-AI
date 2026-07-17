@@ -123,17 +123,17 @@ export default function Dashboard(){
                                             >
                                                 {isGenerating ? (
                                                     <>
-                                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                        <Loader2 className="w-4.0 h-3.5 animate-spin" />
                                                         Generating...
                                                     </>
                                                 ) : diagram ? (
                                                     <>
-                                                        <Sparkles className="w-3.5 h-3.5" />
+                                                        <Sparkles className="w-4.0 h-3.5" />
                                                         Refine
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Wand2 className="w-3.5 h-3.5" />
+                                                        <Wand2 className="w-4.0 h-3.5" />
                                                         Generate
                                                     </>
                                                 )}

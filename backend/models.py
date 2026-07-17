@@ -109,7 +109,11 @@ class ExcalidrawElement(BaseModel):
     boundElements: Optional[List[Dict[str,str]]] = None 
     updated:       int = 1690000000000
     link:          Optional[str] = None 
-    locked:        bool = False 
+    locked:        bool = False
+    groupIds:      List[str] = []
+    frameId:       Optional[str] = None   
+    roundness:     Optional[Dict[str, int]] = None 
+    index:         Optional[str] = None 
     
 class RectangleElement(ExcalidrawElement):
     type:       Literal["rectangle"] = "rectangle"

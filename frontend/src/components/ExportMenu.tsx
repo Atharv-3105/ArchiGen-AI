@@ -29,7 +29,25 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
         try {
             switch (format) {
                 case 'json':
-                    downloadFile(JSON.stringify(diagram, null, 2), 'diagram.excalidraw', 'application/json');
+
+                    //Wrap the payload in official Excalidraw file signature
+                    const excalidrawFile = {
+                        type: "excalidraw",
+                        version: 2,
+                        source: "https://archigenai.vercel.app",
+                        elements: diagram.elements,
+                        appState: {
+                            ...diagram.appState,
+                            viewBackgroundColor: diagram.appState?.viewBackgroundColor || "#ffffff",
+                            gridSize: null,
+                            scrollX: 0,
+                            scrollY: 0,
+                            zoom: {value: 1},
+                        },
+                        files: {}
+                    };
+
+                    downloadFile(JSON.stringify(excalidrawFile, null, 2), 'diagram.excalidraw', 'application/json');
                     break;
                 
                 case 'markdown':
