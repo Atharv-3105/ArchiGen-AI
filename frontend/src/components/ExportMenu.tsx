@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Download, FileText, Code, Image, FileCode, X} from 'lucide-react';
+import {Download, FileText, Code, Image, X, ExternalLink} from 'lucide-react';
 import type { DiagramPayload } from "../lib/schema";
 import { exportToBlob, exportToSvg } from "@excalidraw/excalidraw";
 
@@ -10,6 +10,7 @@ interface ExportMenuProps {
 export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
 
     const [isOpen, setIsOpen] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
     const downloadFile = (content: string | Blob, filename: string, mimetype: string) => {
         const blob = content instanceof Blob ? content: new Blob([content], {type: mimetype});
@@ -26,9 +27,10 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
     };
 
     const handleExport = async (format: string) => {
+        setIsExporting(true);
         try {
             switch (format) {
-                case 'json':
+                case 'json':{
 
                     //Wrap the payload in official Excalidraw file signature
                     const excalidrawFile = {
@@ -47,9 +49,25 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
                         files: {}
                     };
 
-                    downloadFile(JSON.stringify(excalidrawFile, null, 2), 'diagram.excalidraw', 'application/json');
+                    //A try-catch block to build a base64 encoded URL with diagram details and directly open the Excalidraw Website
+                    try {
+                        //stringigy the Excalidraw Payload and Base64 encode
+                        const jsonString = JSON.stringify(excalidrawFile)
+                        const base64Data = btoa(decodeURIComponent(encodeURIComponent(jsonString)));
+
+                        //Construct the Excalidraw URL with the payload
+                        const excalidrawURL = `https://excalidraw.com/#json=${base64Data}`;
+
+                        window.open(excalidrawURL, '_blank');
+                    }catch (error) {
+                        console.error("Failed to encode Excalidraw URL(possibly too large). Falling back to download.", error)
+                        
+                        //Fallback: If DirectURL opening fails, fallback to download the .excalidraw payload so that User can manually upload it
+                        downloadFile(JSON.stringify(excalidrawFile, null, 2), 'diagram.excalidraw', 'application/json');
+                    }
                     break;
-                
+                }
+
                 case 'markdown':
                     downloadFile(diagram.adr_markdown || '# No ADR Available', 'ADR.md', 'text/markdown');
                     break;
@@ -83,6 +101,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
             console.error("Export failed: ", error);
             alert("Failed to export diagram. Check console for details.");
         } finally {
+            setIsExporting(false);
             setIsOpen(false);
         }
     };
@@ -126,7 +145,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
                             className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/[0.03] rounded-lg transition-all btn-icon-shift" 
                             onClick = {() => handleExport('json')}
                         >
-                            <FileCode className="w-4 h-4 text-accent-emerald" /> Excalidraw (.JSON) 
+                            <ExternalLink className="w-4 h-4 text-accent-emerald" /> Open in Excalidrawa
                         </button>
 
                         <div className="h-[1px] bg-border/50 my-1 mx-2" />
