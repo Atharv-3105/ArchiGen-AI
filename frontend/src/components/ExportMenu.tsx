@@ -12,6 +12,8 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ diagram }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
 
+    isExporting;
+
     const downloadFile = (content: string | Blob, filename: string, mimetype: string) => {
         const blob = content instanceof Blob ? content: new Blob([content], {type: mimetype});
         
