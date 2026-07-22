@@ -109,7 +109,7 @@ export default function Dashboard(){
                                             {diagram && (
                                                 <button 
                                                     onClick={resetStream}
-                                                    className="bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-bold py-2.5 px-4.5 rounded-lg border border-border/80 transition-all hover:border-zinc-700 active:scale-95 cursor-pointer"
+                                                    className="bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-bold py-2.5 px-4.5 rounded-lg border border-border/80 transition-all hover:border-zinc-700 active:scale-95 cursor-pointer btn-shine glow-zinc"
                                                     disabled={isGenerating}
                                                     type="button"
                                                 >
@@ -118,7 +118,7 @@ export default function Dashboard(){
                                             )}
                                             <button 
                                                 onClick={handleSubmit}
-                                                className="bg-primary hover:bg-primary-hover disabled:bg-zinc-900 disabled:text-zinc-600 disabled:shadow-none text-white text-xs font-bold py-2.5 px-4.5 rounded-lg transition-all flex items-center gap-1.5 shadow-md shadow-primary/10 hover:shadow-primary/20 active:scale-95 cursor-pointer"
+                                                className="bg-primary hover:bg-primary-hover disabled:bg-zinc-900 disabled:text-zinc-600 disabled:shadow-none text-white text-xs font-bold py-2.5 px-4.5 rounded-lg transition-all flex items-center gap-1.5 shadow-md shadow-primary/10 hover:shadow-primary/20 active:scale-95 cursor-pointer btn-shine glow-indigo btn-icon-spin"
                                                 disabled={isGenerating}
                                             >
                                                 {isGenerating ? (
@@ -145,7 +145,7 @@ export default function Dashboard(){
                                 {diagram?.adr_markdown && (
                                     <button 
                                         onClick={() => setShowADR(true)}
-                                        className="mt-4 w-full bg-surface/50 hover:bg-zinc-900 border border-border/80 text-zinc-300 font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2.5 glass-panel active:scale-98 shadow-md"
+                                        className="mt-4 w-full bg-surface/50 hover:bg-zinc-900 border border-border/80 text-zinc-300 font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2.5 glass-panel active:scale-98 shadow-md btn-shine glow-yellow btn-icon-float"
                                     >
                                         <FileText className="w-4.5 h-4.5 text-yellow-500" />
                                         View Architecture Decision Record (ADR)
@@ -176,7 +176,7 @@ export default function Dashboard(){
                                     Architecture Decision Record (ADR)
                                 </h2>
                                 <button 
-                                    className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/[0.04] transition-colors" 
+                                    className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/[0.04] transition-colors btn-icon-spin" 
                                     onClick={() => setShowADR(false)}
                                 >
                                     <X className="w-5 h-5" />

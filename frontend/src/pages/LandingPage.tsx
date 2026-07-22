@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
-import { Wand2, Zap, Shield, Download, CheckCircle2 } from "lucide-react";
+import { Wand2, Zap, Shield, Download, CheckCircle2, Sparkles } from "lucide-react";
 import heroMockup from "../assets/hero_mockup.jpg";
 
 export default function LandingPage() {
@@ -20,12 +20,12 @@ export default function LandingPage() {
                     <nav className="flex items-center gap-6">
                         <SignedOut>
                             <SignInButton mode="modal">
-                                <button className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+                                <button className="text-sm font-medium text-zinc-400 hover:text-white transition-all hover:scale-105 active:scale-95">
                                     Sign In
                                 </button>
                             </SignInButton>
                             <Link to="/app">
-                                <button className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 px-5 rounded-lg transition-all hover:shadow-lg hover:shadow-primary/20 active:scale-95">
+                                <button className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 px-5 rounded-lg transition-all hover:shadow-lg hover:shadow-primary/20 active:scale-95 btn-shine glow-indigo">
                                     Get Started
                                 </button>
                             </Link>
@@ -41,7 +41,7 @@ export default function LandingPage() {
                                     }}
                                 />
                                 <Link to="/app">
-                                    <button className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 px-5 rounded-lg transition-all hover:shadow-lg hover:shadow-primary/20 active:scale-95">
+                                    <button className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 px-5 rounded-lg transition-all hover:shadow-lg hover:shadow-primary/20 active:scale-95 btn-shine glow-indigo">
                                         Go to App
                                     </button>
                                 </Link>
@@ -65,7 +65,8 @@ export default function LandingPage() {
                     </p>
                     <div className="flex items-center justify-center gap-4 mb-20">
                         <Link to="/app">
-                            <button className="bg-white text-black hover:bg-zinc-200 font-bold py-3.5 px-10 rounded-xl transition-all text-lg shadow-xl shadow-white/10 hover:shadow-white/20 active:scale-95">
+                            <button className="bg-white text-black hover:bg-zinc-200 font-extrabold py-3.5 px-10 rounded-xl transition-all text-lg shadow-xl shadow-white/10 active:scale-95 btn-shine btn-shine-dark glow-white btn-icon-twinkle flex items-center justify-center gap-2.5">
+                                <Sparkles className="w-5 h-5 text-indigo-600 fill-indigo-100" />
                                 Start Generating Free
                             </button>
                         </Link>
@@ -141,7 +142,7 @@ export default function LandingPage() {
                                 <PricingFeature text="Community support" />
                             </ul>
                             <Link to="/app">
-                                <button className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-semibold py-3.5 rounded-xl border border-white/5 transition-all active:scale-98">
+                                <button className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-semibold py-3.5 rounded-xl border border-white/5 transition-all active:scale-98 btn-shine glow-zinc">
                                     Get Started Free
                                 </button>
                             </Link>
