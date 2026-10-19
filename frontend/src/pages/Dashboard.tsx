@@ -133,7 +133,7 @@ export default function Dashboard(){
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Wand2 className="w-4.0 h-3.5" />
+                                                        <Wand2 className="w-4.5 h-3.5" />
                                                         Generate
                                                     </>
                                                 )}
