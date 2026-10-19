@@ -4,3 +4,7 @@ docs
 venv
 .vscode
 backend/archigen.db
+
+video/node_modules
+video/out
+*.db
