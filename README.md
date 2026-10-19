@@ -1,78 +1,101 @@
-# 🏗️ ArchiGen AI: Multi-Agent Architecture Diagram Generator
+# ArchiGen AI
 
-[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
-[![LangGraph](https://img.shields.io/badge/LangGraph-Stateful%20Agents-purple.svg)](https://langchain-ai.github.io/langgraph/)
-[![React](https://img.shields.io/badge/React-18+-61DAFB.svg)](https://react.dev/)
-[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED.svg)](https://www.docker.com/)
+Describe a software system in plain English and get an editable [Excalidraw](https://excalidraw.com) architecture diagram plus a short Architecture Decision Record (ADR).
 
-> **Transform natural language into production-ready, structurally validated architecture diagrams and Architecture Decision Records (ADRs) in seconds.**
+This is a **learning project**. I built it to understand LangGraph (stateful, multi-step LLM workflows), streaming responses over SSE, and how to combine LLMs with deterministic code. Text-to-diagram tools already exist (Excalidraw and Mermaid both have AI features), so this isn't trying to compete with them. The interesting part for me was the design decisions, listed below along with what's still broken.
 
----
+## How it works
 
-## 📌 Executive Summary
-
-**ArchiGen AI** is a full-stack, multi-agent SaaS application that automates the creation of software architecture diagrams. Instead of relying on a single, monolithic LLM prompt (which is prone to hallucination and structural errors), this system employs a **stateful, directed acyclic graph (DAG) of specialized AI agents**. 
-
-It parses intent, designs the logical topology, calculates deterministic physical layouts, applies styling, validates structural integrity, and generates expert annotations—all while streaming real-time progress to a modern React frontend.
-
----
-
-## 🎯 The Problem It Solves
-
-1. **High Friction in Diagramming**: Manual tools (Draw.io, Lucidchart) require deep UI knowledge and time. Engineers spend more time aligning boxes than designing systems.
-2. **LLM Hallucination in Spatial Tasks**: Pure LLM-based diagram generators often output broken JSON, overlapping nodes, or disconnected edges because LLMs lack inherent spatial reasoning.
-3. **Lack of Architectural Context**: Most AI tools generate a pretty picture but fail to document the *why* behind the design (e.g., trade-offs, bottlenecks, security boundaries).
-
-**ArchiGen AI solves this** by decoupling *logical design* (LLM's strength) from *spatial layout* (deterministic algorithm's strength), wrapped in a self-healing validation loop.
-
----
-
-## 🏛️ System Architecture
-
-The backend is orchestrated using **LangGraph**, treating the generation pipeline as a state machine with conditional routing and fallback mechanisms.
+A request runs through a LangGraph state machine. The LLM only produces *logical* structure (components, layers, edges). Everything spatial is computed by normal code.
 
 ```mermaid
 graph TD
-    A[User Input / Refinement] --> B(Parser Agent)
+    A[User input] --> B[Parser - LLM]
     B --> C{Ambiguities?}
-    C -->|Yes| D[Clarification Agent]
-    C -->|No| E[Architecture Agent]
+    C -->|yes| D[Clarification - stub]
+    C -->|no| E[Architecture - LLM]
     D --> E
-    E --> F[Layout Agent <br/> NetworkX + Graphviz]
-    F --> G[Style Agent]
-    G --> H[Validator Agent]
+    E --> F[Layout - NetworkX + Graphviz]
+    F --> G[Style - Excalidraw elements]
+    G --> H[Validator]
     H --> I{Valid?}
-    I -->|No, Attempts < 3| J[Repair Agent]
+    I -->|no, attempts < 3| J[Repair - LLM]
     J --> F
-    I -->|Yes| K[Annotation Agent]
-    K --> L[Export Agent <br/> Mermaid/Markdown]
-    L --> M[(SSE Stream to Frontend)]
+    I -->|yes| K[Annotation - LLM]
+    K --> L[Export - Mermaid]
+    M[Refine request] --> N[Refinement - LLM] --> F
 ```
----
-## Component Breakdown
-1. **Parser Agent**: Extracts structured intent, components, and relationships using few-shot prompting.
-2. **Architecture Agent**: Maps components to standard architectural layers (Frontend, API, Service, Data, Infra) and identifies patterns (e.g., Event-Driven, Microservices).
-3. **Layout Agent**: Converts the logical graph into physical X/Y coordinates using NetworkX + Graphviz. Decision: Deterministic algorithms guarantee mathematically perfect, non-overlapping layouts, unlike LLM coordinate generation.
-4. **Validator Agent**: A pure Python deterministic checker that verifies edge bindings, container relationships, and bounding-box collisions.
-5. **Repair Agent**: Triggered only if the Validator fails. It receives the specific error and the original intent, surgically fixing the ComponentGraph before re-routing to the Layout Agent.
-6. **Annotation Agent**: Analyzes the finalized graph to generate sticky-note callouts and a comprehensive Markdown Architecture Decision Record (ADR).
----
-### Key Technical Decisions & Trade-offs
 
-| Decision | Rationale & Trade-off |
-| :--- | :--- |
-| **LangGraph over basic LangChain** | **Rationale:** Required for stateful orchestration, cyclic graphs (repair loops), and human-in-the-loop potential.<br>**Trade-off:** Steeper learning curve and more complex state management, but necessary for production-grade reliability. |
-| **Deterministic Layout (Graphviz)** | **Rationale:** LLMs are notoriously bad at spatial reasoning (X/Y coordinates). By having the LLM output *only* logical nodes/edges, and using Graphviz for layout, we guarantee 100% valid, non-overlapping Excalidraw exports.<br>**Trade-off:** Requires installing OS-level binaries (`graphviz`), adding slight Docker image bloat. |
-| **Self-Healing Validation Loop** | **Rationale:** Instead of hoping the LLM gets it right, we enforce a schema and structural check. If it fails, a specialized Repair Agent surgically fixes the graph.<br>**Trade-off:** Adds ~2-3s latency on failure, but increases successful render rate from ~70% to ~99%. |
-| **Server-Sent Events (SSE)** | **Rationale:** LLM pipelines can take 5-10 seconds. Polling is inefficient; WebSockets are overkill for unidirectional streams. SSE provides low-latency, real-time UI updates (e.g., "Parser done") with minimal overhead.<br>**Trade-off:** Requires careful frontend `ReadableStream` parsing and backend async generator management. |
-| **Async SQLite Rate Limiting** | **Rationale:** For the MVP/SaaS tiering, async SQLite (`aiosqlite`) provides a lightweight, zero-infrastructure dependency for tracking daily user limits.<br>**Trade-off:** Lacks horizontal scalability compared to Redis/PostgreSQL, but offers a clear, zero-downtime migration path for future scaling. |
+| Node | LLM? | What it does |
+| :--- | :---: | :--- |
+| Parser | yes | Free text → `ParsedIntent` (components, relationships, ambiguities) |
+| Clarification | no | **Stub.** Routing exists but the node doesn't pause for answers yet |
+| Architecture | yes | `ParsedIntent` → `ComponentGraph` (ids, layers, protocols) |
+| Layout | no | Graphviz `dot` computes x/y; falls back to a simple grid if Graphviz fails |
+| Style | no | Maps the positioned graph to Excalidraw rectangles, text and bound arrows |
+| Validator | no | Checks arrow bindings, text containers and rectangle overlaps |
+| Repair | yes | Given validator errors, fixes the graph. Max 3 attempts |
+| Annotation | yes | Writes 2–3 sticky notes and an ADR. Note placement is deterministic |
+| Export | no | Generates Mermaid code |
+| Refinement | yes | Applies an edit instruction to an existing diagram (`/refine`) |
 
----
-## ✨ Core Features
-1. 🧠 Multi-Agent Orchestration: Specialized agents for parsing, designing, laying out, styling, and validating.
-2. 🔄 Natural Language Refinement: "Add a Redis cache between the API and DB" surgically updates the existing graph without regenerating from scratch.
-3. 🛡️ Self-Healing Pipeline: Automated detection and correction of broken bindings or overlapping nodes.
-4. 📝 Auto-Generated ADRs: Every diagram is accompanied by a professional Markdown Architecture Decision Record detailing context, decisions, and consequences.
-5. 📤 Multi-Format Export: Download as Excalidraw JSON, PNG, SVG, Mermaid.js, or Markdown.
-6. 🔐 Enterprise-Ready Auth: Clerk JWT verification with async rate limiting (5 free generations/day).
+Progress is streamed to the React UI over Server-Sent Events (one event per finished node). Auth is Clerk (JWT verified on the backend), with a per-user daily limit of 5 requests stored in SQLite.
+
+## Design decisions
+
+- **LLM for semantics, code for geometry.** Models are unreliable at x/y coordinates, so the LLM never produces them (the annotation prompt doesn't even see them).
+- **Typed contracts between stages.** Each stage has a Pydantic model (`ParsedIntent` → `ComponentGraph` → `PositionedGraph` → `ExcalidrawPayload`), and structured output keeps the LLM inside those schemas.
+- **Validate, then repair with a cap.** A deterministic validator runs first; a failing graph goes to the Repair node, at most 3 times. If it still fails, the API returns an explicit error event.
+- **SSE over WebSockets/polling.** Data only flows server → client. The client uses `fetch` + `ReadableStream` instead of `EventSource` because it needs a POST body and an `Authorization` header.
+- **SQLite for the rate limit.** Zero infrastructure for a small project. It doesn't scale horizontally and isn't durable on ephemeral hosts.
+
+## Known limitations
+
+Being upfront about these:
+
+- **Clarification is a stub.** `/clarify` and `/export` are placeholder endpoints (exports happen client-side).
+- **Layer ordering isn't enforced.** The `rank=same` grouping in `agents/layout.py` is currently ineffective due to an inverted condition, so Graphviz ranks nodes from edge direction only.
+- **Refinement is lossy.** It rebuilds a graph from the rendered Excalidraw JSON (which doesn't carry layers/protocols), and manual canvas edits are discarded on re-layout.
+- **Repair can't see geometry.** The Repair node gets error text, not coordinates, so it's much better at fixing bad edge ids than overlaps.
+- **No automated tests and no evaluation.** I haven't measured how often the first pass succeeds or how often repair helps, so I make no numeric claims. `testing/prompts.md` has manual test prompts.
+- **State is in memory.** The LangGraph `MemorySaver` checkpointer is per-process and never evicted.
+- **Rate limiting is basic.** The check and increment aren't atomic, a failed run still uses a credit, and SQLite resets if the host disk is ephemeral.
+- **Diagram quality is simple.** Arrows are straight lines and long node names aren't wrapped.
+
+## Running locally
+
+Requirements: Python 3.11+, Node 20+, [Graphviz](https://graphviz.org/download/) installed and on `PATH`, a [Groq](https://console.groq.com) API key, and a [Clerk](https://clerk.com) application.
+
+```bash
+# backend/.env
+GROQ_API_KEY=...
+CLERK_ISSUER=https://<your-clerk-domain>
+
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload        # http://localhost:8000
+```
+
+```bash
+# frontend/.env
+VITE_CLERK_PUBLISHABLE_KEY=...
+VITE_BACKEND_URL=http://localhost:8000
+
+cd frontend
+npm install
+npm run dev                      # http://localhost:3000
+```
+
+There is also a `docker-compose.yml` for running both services (it uses the Vite dev server, so it's for development, not deployment). The SQLite file (`backend/archigen.db`) is created on first start and is git-ignored.
+
+## Stack
+
+FastAPI · LangGraph · LangChain + Groq (`llama-3.3-70b-versatile`) · NetworkX + Graphviz · Pydantic · aiosqlite · React 19 · Vite · Tailwind · Excalidraw · Zod · Clerk
+
+## What I'd do next
+
+1. Fix the layer grouping and add unit tests for layout, validator and Mermaid export.
+2. Persist the `ComponentGraph` and make refinement apply patches to it instead of re-deriving it from the rendered diagram.
+3. Implement clarification with LangGraph `interrupt` and a durable checkpointer.
+4. Write a small eval script (first-pass validity, repair rate, latency) so claims are measured.
+5. Make the rate limit atomic.
