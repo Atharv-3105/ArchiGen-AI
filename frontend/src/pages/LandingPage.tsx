@@ -55,13 +55,13 @@ export default function LandingPage() {
                 {/* Hero Section */}
                 <section className="max-w-5xl mx-auto px-6 pt-24 pb-16 text-center flex flex-col items-center">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary-accent text-xs font-semibold mb-8 animate-pulse-glow">
-                        <Zap className="w-3.5 h-3.5 fill-primary/20" /> Powered by Multi-Agent AI
+                        <Zap className="w-3.5 h-3.5 fill-primary/20" /> Multi-step AI pipeline
                     </div>
                     <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 leading-[1.1] max-w-4xl bg-gradient-to-b from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent">
-                        Architectural Diagrams, <br /> generated in seconds.
+                        Architecture diagrams, <br /> from plain English.
                     </h1>
                     <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-                        Describe your software system in plain English. Our AI pipeline designs the architecture, calculates the layout, and exports production-ready diagrams and decision records.
+                        Describe your software system in plain English. A multi-step AI pipeline designs the architecture, computes the layout, and gives you an editable Excalidraw diagram with a short decision record.
                     </p>
                     <div className="flex items-center justify-center gap-4 mb-20">
                         <Link to="/app">
@@ -95,21 +95,21 @@ export default function LandingPage() {
                 {/* Features Section */}
                 <section className="max-w-6xl mx-auto px-6 py-20 border-t border-white/5">
                     <h2 className="text-3xl md:text-4xl font-extrabold text-center text-white tracking-tight mb-4">
-                        Everything you need to design systems
+                        What's inside
                     </h2>
                     <p className="text-center text-zinc-400 max-w-xl mx-auto mb-16 text-sm md:text-base">
-                        Skip drawing boxes manually. Our autonomous agent system handles everything from design rules to layout math.
+                        A learning project: LLMs handle the design, plain code handles the layout and validation.
                     </p>
                     <div className="grid md:grid-cols-3 gap-8">
                         <FeatureCard 
                             icon={<Zap className="w-6 h-6 text-yellow-400" />} 
                             title="Multi-Agent Pipeline" 
-                            desc="Parser, Architecture, Layout, and Style agents work together in sequence to understand your intent and construct the perfect flowchart." 
+                            desc="Parser, Architecture, Layout, and Style agents run in sequence to understand your intent and build an editable diagram." 
                         />
                         <FeatureCard 
                             icon={<Shield className="w-6 h-6 text-accent-emerald" />} 
                             title="Self-Healing Validation" 
-                            desc="Built-in validator and repair agents test connection intersections and layouts, fixing structure flaws dynamically in a 3-turn feedback loop." 
+                            desc="A validator checks arrow bindings and overlapping boxes. If something fails, a repair step retries up to 3 times." 
                         />
                         <FeatureCard 
                             icon={<Download className="w-6 h-6 text-blue-400" />} 
@@ -119,57 +119,25 @@ export default function LandingPage() {
                     </div>                    
                 </section>
 
-                {/* Pricing Section */}
+                {/* Limits Section */}
                 <section className="max-w-5xl mx-auto px-6 py-20 border-t border-white/5">
                     <h2 className="text-3xl md:text-4xl font-extrabold text-center text-white tracking-tight mb-3">
-                        Simple, transparent pricing
+                        Free while in beta
                     </h2>
-                    <p className="text-center text-zinc-400 mb-16">Start for free, upgrade when you need more power.</p>
-                    <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                        {/* Free Tier */}
-                        <div className="p-8 rounded-2xl bg-surface/40 border border-white/5 flex flex-col glass-panel hover:border-white/10 transition-colors">
-                            <h3 className="text-xl font-bold text-white mb-2">Free Plan</h3>
-                            <p className="text-zinc-400 text-sm mb-6">Perfect for exploring and quick architecture sketches.</p>
-                            <div className="mb-8">
-                                <span className="text-5xl font-extrabold text-white tracking-tight">Rs.0</span>
-                                <span className="text-zinc-500 text-sm"> / month</span>
-                            </div>
-
-                            <ul className="space-y-4 mb-8 flex-1">
-                                <PricingFeature text="5 diagrams per day" />
-                                <PricingFeature text="PNG, SVG, JSON Export" />
-                                <PricingFeature text="Basic AI annotations" />
-                                <PricingFeature text="Community support" />
+                    <p className="text-center text-zinc-400 mb-12">No paid plans. A small daily limit keeps API costs sane.</p>
+                    <div className="max-w-md mx-auto">
+                        <div className="p-8 rounded-2xl bg-surface/40 border border-white/5 flex flex-col glass-panel">
+                            <ul className="space-y-4 mb-8">
+                                <PricingFeature text="5 generations or refinements per day" />
+                                <PricingFeature text="PNG, SVG and Excalidraw export" />
+                                <PricingFeature text="Mermaid code and Markdown ADR export" />
+                                <PricingFeature text="AI sticky-note annotations" />
                             </ul>
                             <Link to="/app">
                                 <button className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-semibold py-3.5 rounded-xl border border-white/5 transition-all active:scale-98 btn-shine glow-zinc">
-                                    Get Started Free
+                                    Get Started
                                 </button>
                             </Link>
-                        </div>
-
-                        {/* Pro Tier (Glowing/Featured Card) */}
-                        <div className="p-8 rounded-2xl bg-surface/50 border border-primary/30 relative flex flex-col shadow-2xl shadow-primary/5 overflow-hidden glass-panel glow-border">
-                            <div className="absolute top-0 right-6 -translate-y-1/2 bg-gradient-to-r from-primary to-accent-violet text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
-                                Recommended
-                            </div>
-                            <h3 className="text-xl font-bold text-white mb-2">PRO Plan</h3>
-                            <p className="text-zinc-400 text-sm mb-6">For professional architects, developers, and product teams.</p>
-                            <div className="mb-8">
-                                <span className="text-5xl font-extrabold text-white tracking-tight bg-gradient-to-r from-primary-accent to-accent-violet bg-clip-text text-transparent">Free</span>
-                                <span className="text-zinc-500 text-sm"> / month (Beta)</span>
-                            </div>
-
-                            <ul className="space-y-4 mb-8 flex-1">
-                                <PricingFeature text="Unlimited Diagrams" />
-                                <PricingFeature text="Mermaid.js & Markdown ADR Export" />
-                                <PricingFeature text="Advanced AI refinement & Annotations" />
-                                <PricingFeature text="Priority AI processing queue" />
-                                <PricingFeature text="Save and manage diagram history" />
-                            </ul>
-                            <button className="w-full bg-gradient-to-r from-primary to-accent-violet hover:from-primary-hover hover:to-accent-violet/90 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-primary/20 active:scale-98 cursor-not-allowed opacity-60">
-                                Coming Soon
-                            </button>
                         </div>
                     </div>
                 </section>
